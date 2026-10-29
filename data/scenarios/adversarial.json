@@ -1,0 +1,31 @@
+{
+  "name": "adversarial",
+  "description": "Any move exceeds the venue cap (expect guardrails to block).",
+  "balances": {
+    "usdc": "20000000",
+    "ethWei": "1000000000000000"
+  },
+  "positions": {
+    "idle": "20000000",
+    "aave-v3-usdc": "80000000"
+  },
+  "snapshot": {
+    "updatedAt": "2026-10-29T17:37:39Z",
+    "venues": [
+      {
+        "id": "idle",
+        "name": "Idle wallet",
+        "apy": 0,
+        "tvlUsd": 0,
+        "riskNote": "No yield."
+      },
+      {
+        "id": "aave-v3-usdc",
+        "name": "Aave V3 USDC",
+        "apy": 100.0,
+        "tvlUsd": 1000000,
+        "riskNote": "Variable APY."
+      }
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+node_modules/
+.env
+spikes/model.gguf
+spikes/wdk/node_modules/
+data/journal.jsonl
+data/queue.jsonl
+*.log

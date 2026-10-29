@@ -1,0 +1,45 @@
+{
+  "updatedAt": "2026-10-29T22:53:10.958Z",
+  "venues": [
+    {
+      "id": "idle",
+      "name": "Idle wallet",
+      "apy": 0,
+      "tvlUsd": 0,
+      "riskNote": "Cash reserve; no yield.",
+      "sourceUrl": "local"
+    },
+    {
+      "id": "aave-v3-usdc",
+      "name": "Aave V3 USDC (Base)",
+      "apy": 4.13,
+      "tvlUsd": 197630000,
+      "riskNote": "Protocol APR ~4.13%; +1.32% USDC reward APR via Merkl; variable.",
+      "sourceUrl": "https://app.aave.com/?marketName=proto_base_v3"
+    },
+    {
+      "id": "moonwell-flagship-usdc",
+      "name": "Moonwell Flagship USDC (Morpho)",
+      "apy": 5.29,
+      "tvlUsd": 2525633,
+      "riskNote": "Curated vault (Anthias). Net 5.29% excluding 0.18pp rewards; 15% perf fee.",
+      "sourceUrl": "https://app.morpho.org/base/vault/0xc1256Ae5FF1cf2719D4937adb3bbCCab2E00A2Ca/moonwell-flagship-usdc"
+    },
+    {
+      "id": "clearstar-cbassets-usdc",
+      "name": "Clearstar cbAssets USDC (Morpho)",
+      "apy": 5.4,
+      "tvlUsd": 32448798,
+      "riskNote": "Curated vault (Clearstar). Native 5.40% (7.20% incl. rewards); 10% perf fee; thin newer collateral markets.",
+      "sourceUrl": "https://app.morpho.org/base/vault/0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c/clearstar-cbassets-vault"
+    },
+    {
+      "id": "spark-usdc",
+      "name": "Spark USDC (Morpho)",
+      "apy": 5.62,
+      "tvlUsd": 487012234,
+      "riskNote": "Curated vault (SparkDAO). Net 5.62% (no separate rewards); RWA/blue-chip markets.",
+      "sourceUrl": "https://app.morpho.org/base/vault/0x7BfA7C4f149E7415b73bdeDfe609237e29CBF34A/spark-usdc-vault"
+    }
+  ]
+}

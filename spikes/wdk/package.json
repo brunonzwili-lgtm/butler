@@ -1,0 +1,10 @@
+{
+  "name": "wdk-spike",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@tetherto/wdk-protocol-lending-aave-evm": "^1.0.0-beta.8",
+    "@tetherto/wdk-wallet-evm": "^1.0.0-beta.24"
+  }
+}
