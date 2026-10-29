@@ -35,6 +35,17 @@ Use a fresh wallet with only a few dollars of USDC plus a small amount of ETH on
 5. Run one real withdraw and confirm.
 6. Save both transaction hashes and explorer links in `data/proof.md`.
 
+## Limitations and scope
+
+- APYs are **native/net-of-rewards** figures only. Merkl/incentive-token rewards are shown in `data/yields.json` but are not counted as collectable yield.
+- ERC-4626 full exits use `redeem(maxRedeem(owner))`; vault liquidity can cap redemption size, and rounding dust is possible.
+- Aave V3 is native (not ERC-4626); supply and withdraw use the Aave protocol calls directly.
+- Yield-gain spreads are small (≈0.2–1.6pp), so with `minApyGap` the agent will often hold. This is intentional to avoid churning and paying gas on small balances.
+- Live transaction proof is recorded in `data/proof.md` as round trips are run; until then, demos use `MockExecutor`.
+- Only a local 1B model is used. Candidate enumeration plus forced JSON schema keeps outputs valid, with retry and ranked fallback on failure.
+- Fiat on-ramps and mobile-money flows are roadmap ideas, not verified integrations.
+- A polished pooled-vault (shared deposits) is roadmap, not implemented.
+
 ## Mainnet run order
 
 Fund → mainnet-check → one supply → one withdraw → save proof links. This is the judging evidence of live execution.
