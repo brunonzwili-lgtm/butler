@@ -70,6 +70,23 @@ export function createHandler(deps = {}) {
       }
     }
 
+    if (req.method === 'GET' && p === '/api/address') {
+      try {
+        const seed = process.env.WDK_SEED;
+        if (!seed) return json(res, 200, { address: null });
+        const { default: WalletManagerEvm } = await import('@tetherto/wdk-wallet-evm');
+        const chainId = Number(process.env.CHAIN_ID || 84532);
+        const rpc = process.env.RPC_URL || (chainId === 8453 ? 'https://mainnet.base.org' : 'https://sepolia.base.org');
+        const wallet = new WalletManagerEvm(seed, { provider: rpc, chainId });
+        const account = await wallet.getAccount(0);
+        const address = await account.getAddress();
+        try { await wallet.dispose?.(); } catch {}
+        return json(res, 200, { address });
+      } catch (e) {
+        return json(res, 500, { error: String(e && e.message ? e.message : e) });
+      }
+    }
+
     if (req.method === 'GET' && p === '/api/status') {
       return json(res, 200, { modelReady, busy, queueCount: pendingFn().length, loadTimeMs: getLoadTimeMsFn() });
     }
@@ -86,6 +103,17 @@ export function createHandler(deps = {}) {
         lines = raw.split('\n').filter(Boolean).map((l) => JSON.parse(l));
       } catch {}
       return json(res, 200, lines);
+    }
+
+    if (req.method === 'GET' && p === '/api/observe') {
+      try {
+        const { observe } = await import('../agent/observe.js');
+        const source = url.searchParams.get('source') || 'idle-opportunity';
+        const state = await observe(source);
+        return json(res, 200, state);
+      } catch (e) {
+        return json(res, 500, { error: String(e && e.message ? e.message : e) });
+      }
     }
 
     const jobMatch = p.match(/^\/api\/job\/([a-f0-9-]+)$/);
