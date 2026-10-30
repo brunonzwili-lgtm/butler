@@ -10,6 +10,7 @@
     "deposit": "node src/deposit/index.js",
     "run": "node src/exec/run.js",
     "flush": "node src/exec/flush-cli.js",
+    "ui": "node src/ui/server.js",
     "proof-roundtrip": "node scripts/proof-roundtrip.mjs",
     "test": "node --test tests/**/*.test.js"
   },

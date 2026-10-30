@@ -46,6 +46,32 @@ Use a fresh wallet with only a few dollars of USDC plus a small amount of ETH on
 - Fiat on-ramps and mobile-money flows are roadmap ideas, not verified integrations.
 - A polished pooled-vault (shared deposits) is roadmap, not implemented.
 
+## Offline run (no Wi-Fi)
+
+Pre-flight (with internet, once):
+1. Install deps: `npm install`
+2. Download model to `spikes/model.gguf` (see `AGENTS.md`).
+3. Warm up: `npm run cycle -- --source idle-opportunity`
+
+Then turn Wi-Fi off and run:
+```bash
+OFFLINE=1 MAX_USDC_PER_TX=2 printf 'yes\n' | env OFFLINE=1 npm run run -- --source idle-opportunity --executor mock
+npm run flush -- --executor mock
+```
+
+What works offline:
+- Local model inference (QVAC GGUF cached locally)
+- Candidate enumeration + deterministic guardrails
+- Confirmation prompt
+- Offline intent queue (`data/queue.jsonl`)
+- Flush after reconnect
+
+What needs internet:
+- `--source live` (Base RPC balances/Aave)
+- Model download
+- `scripts/mainnet-check.mjs`, `scripts/vault-check.mjs`, `scripts/proof-roundtrip.mjs`
+- Refreshing APYs/timestamps
+
 ## Mainnet run order
 
 Fund → mainnet-check → one supply → one withdraw → save proof links. This is the judging evidence of live execution.

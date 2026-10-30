@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Butler — on-device yield rebalancer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <main class="max-w-4xl mx-auto px-6 py-12">
+    <header class="mb-10">
+      <h1 class="text-4xl font-bold">Butler</h1>
+      <p class="text-slate-300 mt-2">
+        An on-device agentic yield rebalancer. The model proposes; deterministic
+        guardrails and the user decide; WDK executes on Base.
+      </p>
+    </header>
+
+    <section class="bg-slate-900 rounded-2xl p-6 mb-8">
+      <h2 class="text-2xl font-semibold mb-3">Deposit</h2>
+      <p class="text-slate-300 mb-4">Network: <strong>Base (chain 8453)</strong> (test on Base Sepolia 84532 first).</p>
+      <p class="text-slate-300 mb-4">Accepted asset: <strong>USDC</strong>. A small amount of <strong>ETH</strong> is needed for gas.</p>
+      <div class="flex flex-col md:flex-row gap-6 items-start">
+        <div>
+          <p class="text-sm text-slate-400 mb-1">Your wallet address (derived from your own seed):</p>
+          <code id="addr" class="block bg-slate-800 px-3 py-2 rounded break-all">Set WDK_SEED in your environment, then run: node scripts/sepolia-check.mjs (prints address)</code>
+          <div id="qrcode" class="mt-4"></div>
+        </div>
+        <div class="text-sm text-slate-400">
+          <p class="mb-2"><strong>Warning:</strong> send only USDC and ETH on Base. Other tokens or chains may be lost.</p>
+          <p>Run the full flow in the terminal: <code class="bg-slate-800 px-1 rounded">npm run run -- --source live --executor live</code></p>
+      <div class="mt-4 space-y-3">
+        <select id="source" class="bg-slate-800 px-3 py-2 rounded">
+          <option value="idle-opportunity">idle-opportunity</option>
+          <option value="already-optimal">already-optimal</option>
+          <option value="adversarial">adversarial</option>
+          <option value="all-in-temptation">all-in-temptation</option>
+        </select>
+        <button onclick="runCycle()" class="px-4 py-2 bg-blue-600 rounded">Run cycle</button>
+        <button onclick="flushQueue()" class="px-4 py-2 bg-emerald-600 rounded">Flush queue</button>
+        <pre id="out" class="bg-slate-800 p-3 rounded mt-3 text-xs overflow-auto max-h-80"></pre>
+      </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-slate-900 rounded-2xl p-6 mb-8">
+      <h2 class="text-2xl font-semibold mb-3">Venues (net-of-rewards APY)</h2>
+      <table class="w-full text-left">
+        <thead class="text-slate-400"><tr><th class="py-2">Venue</th><th>APY</th><th>TVL (USD)</th></tr></thead>
+        <tbody>
+          <tr><td class="py-2">Idle wallet (cash reserve)</td><td>0.00%</td><td>—</td></tr>
+          <tr><td class="py-2">Aave V3 USDC (Base)</td><td>4.13%</td><td>~197.6M</td></tr>
+          <tr><td class="py-2">Moonwell Flagship USDC</td><td>5.29%</td><td>~2.5M</td></tr>
+          <tr><td class="py-2">Clearstar cbAssets USDC</td><td>5.40%</td><td>~32.4M</td></tr>
+          <tr><td class="py-2">Spark USDC</td><td>5.62%</td><td>~487M</td></tr>
+        </tbody>
+      </table>
+      <p class="text-xs text-slate-500 mt-3">APY basis: native/net of rewards only. Figures read from official Aave/Morpho pages.</p>
+    </section>
+
+    <section class="bg-slate-900 rounded-2xl p-6 mb-8">
+      <h2 class="text-2xl font-semibold mb-3">Safety</h2>
+      <ul class="list-disc list-inside text-slate-300 space-y-1">
+        <li>The model only chooses among pre-validated candidate moves (forced JSON schema, temperature 0).</li>
+        <li>Guardrails enforce known venues, caps, APY gaps, gas reserve, and snapshot freshness.</li>
+        <li>`MAX_USDC_PER_TX` ceiling, exact-amount approvals only.</li>
+        <li>Offline: decision is guardrailed and queued; replay re-validates against fresh state before broadcast.</li>
+        <li>Confirmation requires typing <code class="bg-slate-800 px-1 rounded">yes</code> exactly.</li>
+      </ul>
+    </section>
+
+    <section class="text-sm text-slate-400">
+      <p>Live proof links: <code>data/proof.md</code>. All local tests: <code>npm test</code>.</p>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    async function runCycle() {
+      const src = document.getElementById('source').value;
+      const out = document.getElementById('out');
+      out.textContent = 'model thinking...';
+      const res = await fetch('/api/cycle', { method: 'POST', headers: {'content-type':'application/json'}, body: JSON.stringify({ source: src }) });
+      const data = await res.json();
+      out.textContent = JSON.stringify(data, null, 2);
+    }
+    async function flushQueue() {
+      const src = document.getElementById('source').value;
+      const out = document.getElementById('out');
+      out.textContent = 'flushing...';
+      const res = await fetch('/api/flush', { method: 'POST', headers: {'content-type':'application/json'}, body: JSON.stringify({ source: src, executor: 'mock' }) });
+      const data = await res.json();
+      out.textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+  <script>
+    // Example: the real address comes from your device, printed by sepolia-check/mainnet-check.
+    // Uncomment if you paste a public test address; never paste a real seed.
+    // new QRCode(document.getElementById("qrcode"), { text: "0x…", width: 160, height: 160 });
+  </script>
+</body>
+</html>
