@@ -145,5 +145,3 @@ export function createHandler(deps = {}) {
     return json(res, 404, { error: 'not found' });
   };
 }
-
-export { createHandler };
