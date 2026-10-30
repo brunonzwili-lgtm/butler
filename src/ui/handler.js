@@ -1,5 +1,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ensureModel, getLoadTimeMs } from '../agent/model.js';
 import { runCycle } from '../agent/loop.js';
 import { flush } from '../exec/flush.js';
@@ -29,6 +31,9 @@ async function readBody(req) {
   return data ? JSON.parse(data) : {};
 }
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, '..', '..');
+
 export function createHandler(deps = {}) {
   const ensureModelFn = deps.ensureModel || ensureModel;
   const getLoadTimeMsFn = deps.getLoadTimeMs || getLoadTimeMs;
@@ -54,6 +59,16 @@ export function createHandler(deps = {}) {
 
     const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
     const p = url.pathname;
+
+    if (req.method === 'GET' && (p === '/' || p === '/index.html')) {
+      try {
+        const html = (deps.readFile || fs.readFileSync)(path.join(ROOT, 'public', 'index.html'), 'utf8');
+        res.writeHead(200, { 'content-type': 'text/html' });
+        return res.end(html);
+      } catch {
+        return json(res, 500, { error: 'index.html not found' });
+      }
+    }
 
     if (req.method === 'GET' && p === '/api/status') {
       return json(res, 200, { modelReady, busy, queueCount: pendingFn().length, loadTimeMs: getLoadTimeMsFn() });
