@@ -27,6 +27,12 @@ export class MockExecutor extends Executor {
   async isOnline() {
     return process.env.OFFLINE !== '1';
   }
+  async signSupply({ venue, amountUsdc }) {
+    return `mock-signed-supply-${amountUsdc}`;
+  }
+  async signWithdraw({ venue, amountUsdc }) {
+    return `mock-signed-withdraw-${amountUsdc}`;
+  }
 }
 
 export class AaveBaseExecutor extends Executor {

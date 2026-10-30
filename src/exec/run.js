@@ -89,8 +89,8 @@ const isWithdraw = result.proposal.from === 'aave-v3-usdc' && result.proposal.to
 
 if (!online) {
   const signed = isSupply
-    ? await executor.signSupply(amount)
-    : await executor.signWithdraw(amount);
+    ? await executor.signSupply({ venue: 'aave-v3-usdc', amountUsdc: amount })
+    : await executor.signWithdraw({ venue: 'aave-v3-usdc', amountUsdc: amount });
   const intent = enqueue(result.proposal, { approvedAt: new Date().toISOString(), signedTx: signed, amountUsdc: amount.toString() });
   console.log('\nOffline: approved intent queued.');
   console.log('intent id:', intent.id);
