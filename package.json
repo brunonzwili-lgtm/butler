@@ -12,7 +12,7 @@
     "flush": "node src/exec/flush-cli.js",
     "ui": "node src/ui/server.js",
     "proof-roundtrip": "node scripts/proof-roundtrip.mjs",
-    "test": "node --test tests/**/*.test.js"
+    "test": "node --test --test-concurrency=1 tests/**/*.test.js"
   },
   "dependencies": {
     "@qvac/diffusion-cpp": "^0.31.0",

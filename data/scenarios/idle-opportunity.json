@@ -10,7 +10,7 @@
     "aave-v3-usdc": "0"
   },
   "snapshot": {
-    "updatedAt": "2026-10-29T17:37:39Z",
+    "updatedAt": "2026-10-30T19:10:47.289Z",
     "venues": [
       {
         "id": "idle",
@@ -22,7 +22,7 @@
       {
         "id": "aave-v3-usdc",
         "name": "Aave V3 USDC",
-        "apy": 5.0,
+        "apy": 5,
         "tvlUsd": 1000000,
         "riskNote": "Variable APY."
       }
