@@ -20,10 +20,23 @@ while (true) {
   try {
     if (cmd === 'help') {
       console.log('optimize [source]  run a cycle and show the proposal');
-      console.log('status [source]    show balances/allocation/snapshot');
+      console.log('status [source]    show balances/allocation/snapshot')
+      console.log('deposit            show the wallet deposit address');
       console.log('approve            approve the pending proposal');
       console.log('reject             reject the pending proposal');
       console.log('exit               quit');
+    } else if (cmd === 'deposit') {
+      const { printDepositInfo } = await import('../deposit/info.js');
+      const seed = process.env.WDK_SEED;
+      if (!seed) { console.log('Set WDK_SEED to show your address.'); continue; }
+      const { default: WalletManagerEvm } = await import('@tetherto/wdk-wallet-evm');
+      const chainId = Number(process.env.CHAIN_ID || 84532);
+      const rpc = process.env.RPC_URL || (chainId === 8453 ? 'https://mainnet.base.org' : 'https://sepolia.base.org');
+      const w = new WalletManagerEvm(seed, { provider: rpc, chainId });
+      const a = await w.getAccount(0);
+      const addr = await a.getAddress();
+      await w.dispose?.();
+      printDepositInfo({ address: addr, network: chainId === 8453 ? 'base' : 'sepolia', usdcAddress: process.env.USDC_ADDRESS });
     } else if (cmd === 'status') {
       const { observe } = await import('./observe.js');
       const st = await observe(source);
@@ -36,9 +49,10 @@ while (true) {
       pending = r.verdict === 'approved' ? r : null;
       console.log('verdict:', r.verdict);
       if (r.violations?.length) console.log('violations:', r.violations);
-      console.log('proposal:', JSON.stringify(r.proposal));
+      const p = r.proposal;
+      console.log(`I propose: move ${p.amountPct}% (${p.action}) from ${p.from} to ${p.to}. Reason: ${p.reason}`);
       console.log('attempts:', r.attempts, 'loadMs:', r.loadTimeMs, 'inferMs:', r.inferenceTimeMs);
-      if (pending) console.log('Type "approve" to execute/queue, or "reject" to cancel.');
+      if (pending) console.log('Reply "approve" to execute/queue, or "reject" to cancel.');
     } else if (cmd === 'approve') {
       if (!pending) { console.log('No pending approved proposal.'); continue; }
       const amount = pending.state?.balances?.usdc ?? 0n;
