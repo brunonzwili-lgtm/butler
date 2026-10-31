@@ -5,11 +5,22 @@ On-device agentic yield rebalancer for the AI Yako hackathon (QVAC + Tether WDK)
 ## Commands
 
 ```bash
-npm run cycle -- --source idle-opportunity   # observe -> propose -> validate (no tx)
+npm run chat                                   # interactive assistant: protocols, optimize, approve, status, deposit
+npm run cycle -- --source idle-opportunity      # observe -> propose -> validate (no tx)
 npm run run -- --source idle-opportunity --executor mock   # + confirm + execute/queue
-npm run flush -- --executor mock              # flush queued intents
-npm test                                      # unit tests
+npm run flush -- --executor mock               # flush queued intents
+npm run ui                                     # local web UI at http://127.0.0.1:3000
+npm test                                       # unit tests
 ```
+
+## Chat usage
+
+```bash
+npm run chat
+```
+
+Try: `protocols`, `status`, `optimize`, `approve` (it asks amount), `deposit`, `exit`.
+Offline chat uses cached fixtures only: `OFFLINE=1 npm run chat`.
 
 ## APY basis
 
