@@ -33,6 +33,7 @@ while (true) {
     if (cmd === 'help') {
       console.log('optimize [source]  run a cycle and show the proposal');
       console.log('status [source]    show balances/allocation/snapshot');
+      console.log('balance [source]   show wallet balances only');
       console.log('deposit            show the wallet deposit address');
       console.log('protocols          show integrated venues and APY');
       console.log('approve            approve the pending proposal (asks amount)');
@@ -53,6 +54,11 @@ while (true) {
     } else if (cmd === 'protocols') {
       const y = JSON.parse(readFileSync('data/yields.json', 'utf8'));
       for (const v of y.venues) console.log(`${v.id}: ${(v.apy ?? 0).toFixed(2)}%  (${v.sourceUrl})`);
+    } else if (cmd === 'balance') {
+      const { observe } = await import('./observe.js');
+      const st = await observe(source);
+      console.log('USDC:', st.balances.usdc, '  ETH(wei):', st.balances.ethWei);
+      console.log('allocation:', st.allocation);
     } else if (cmd === 'status') {
       const { observe } = await import('./observe.js');
       const st = await observe(source);
@@ -63,6 +69,7 @@ while (true) {
       console.log('model thinking...');
       const r = await runCycle(source);
       pending = r.verdict === 'approved' ? r : null;
+      console.log('balances:', r.state.balances, 'allocation:', r.state.allocation);
       console.log('verdict:', r.verdict);
       if (r.violations?.length) console.log('violations:', r.violations);
       const p = r.proposal;
@@ -83,6 +90,7 @@ while (true) {
       const verdict = validate(replayProposal, pending.state, defaultConfig);
       if (!verdict.ok) {
         console.log('Blocked by guardrails:', verdict.violations);
+        console.log('Hint: enter 25 (default) or another value that keeps every venue at or below 80%.');
         pending = null;
         continue;
       }
