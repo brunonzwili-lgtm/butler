@@ -103,12 +103,17 @@ while (true) {
         const { enqueue } = await import('../exec/queue.js');
         const intent = enqueue(replayProposal, { amountUsdc: amount.toString() });
         console.log(`Queued offline (no broadcast): ${amount} base units. intent=${intent.id}`);
+        console.log('Next: when online, run `npm run flush` to re-check guardrails and broadcast.');
+        console.log(`Move plan: ${pct}% ${replayProposal.from} -> ${replayProposal.to} (${amount} base units).`);
+        console.log('Monitoring: Butler does not run continuously; re-run optimize/status later to review.');
       } else {
         const isSupply = replayProposal.from === 'idle' && replayProposal.to === 'aave-v3-usdc';
         const res = isSupply
           ? await executor.supply({ venue: replayProposal.to, amountUsdc: amount })
           : await executor.withdraw({ venue: replayProposal.from, amountUsdc: amount });
         console.log(`Done. tx=${res.txHash} amount=${amount} base units`);
+        console.log(`Move plan executed: ${pct}% ${replayProposal.from} -> ${replayProposal.to}.`);
+        console.log('Monitoring: use `status` or `optimize` later to review allocation.');
       }
       pending = null;
     } else if (cmd === 'reject') {
