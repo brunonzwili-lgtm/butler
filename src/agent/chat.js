@@ -96,23 +96,30 @@ while (true) {
       }
       const base = pending.state?.balances?.usdc ?? 0n;
       const amount = (BigInt(base) * BigInt(Math.round(pct * 100))) / 10000n;
+      const when = (await rl.question('Execute when? (now/later, default now): ')).trim().toLowerCase() || 'now';
+      let notBefore = null;
+      if (when === 'later') {
+        const minsStr = (await rl.question('Delay in minutes (default 60): ')).trim();
+        const mins = minsStr === '' ? 60 : Number(minsStr);
+        if (!Number.isFinite(mins) || mins <= 0) { console.log('Invalid delay; cancelled.'); pending = null; continue; }
+        notBefore = new Date(Date.now() + mins * 60000).toISOString();
+      }
       const isOffline = process.env.OFFLINE === '1';
       const { createExecutor } = await import('../exec/executor.js');
       const executor = createExecutor('mock');
-      if (isOffline) {
+      if (isOffline || notBefore) {
         const { enqueue } = await import('../exec/queue.js');
-        const intent = enqueue(replayProposal, { amountUsdc: amount.toString() });
-        console.log(`Queued offline (no broadcast): ${amount} base units. intent=${intent.id}`);
-        console.log('Next: when online, run `npm run flush` to re-check guardrails and broadcast.');
-        console.log(`Move plan: ${pct}% ${replayProposal.from} -> ${replayProposal.to} (${amount} base units).`);
-        console.log('Monitoring: Butler does not run continuously; re-run optimize/status later to review.');
+        const intent = enqueue(replayProposal, { amountUsdc: amount.toString(), notBefore });
+        console.log(`Queued${notBefore ? ` (due ${notBefore})` : ' offline (no broadcast)'}: ${amount} base units. intent=${intent.id}`);
+        console.log(`Move plan: ${pct}% ${replayProposal.from} -> ${replayProposal.to}. Yield accrues at the destination after execution.`);
+        console.log('Monitoring: Butler does not run automatically; run `npm run flush` after reconnect/due time to broadcast.');
       } else {
         const isSupply = replayProposal.from === 'idle' && replayProposal.to === 'aave-v3-usdc';
         const res = isSupply
           ? await executor.supply({ venue: replayProposal.to, amountUsdc: amount })
           : await executor.withdraw({ venue: replayProposal.from, amountUsdc: amount });
         console.log(`Done. tx=${res.txHash} amount=${amount} base units`);
-        console.log(`Move plan executed: ${pct}% ${replayProposal.from} -> ${replayProposal.to}.`);
+        console.log(`Move plan executed: ${pct}% ${replayProposal.from} -> ${replayProposal.to}. Yield accrues automatically at the destination; positions update on next balance check.`);
         console.log('Monitoring: use `status` or `optimize` later to review allocation.');
       }
       pending = null;

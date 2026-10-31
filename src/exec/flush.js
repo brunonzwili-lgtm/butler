@@ -32,6 +32,15 @@ export async function flush(executor, observeFn, config = defaultConfig) {
       continue;
     }
 
+    // Delayed intent (timeframe): skip until due.
+    if (intent.notBefore) {
+      const due = new Date(intent.notBefore).getTime();
+      if (Date.now() < due) {
+        results.push({ id: intent.id, status: 'queued', reason: 'not_yet_due', notBefore: intent.notBefore });
+        continue;
+      }
+    }
+
     // Connectivity check.
     let online = true;
     if (typeof executor.isOnline === 'function') {
