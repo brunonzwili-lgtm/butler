@@ -24,7 +24,8 @@ while (true) {
       console.log('deposit            show the wallet deposit address');
       console.log('approve            approve the pending proposal');
       console.log('reject             reject the pending proposal');
-      console.log('exit               quit');
+      console.log('protocols           show integrated venues and APY');
+      console.log('exit                quit');
     } else if (cmd === 'deposit') {
       const { printDepositInfo } = await import('../deposit/info.js');
       const seed = process.env.WDK_SEED;
@@ -37,6 +38,10 @@ while (true) {
       const addr = await a.getAddress();
       await w.dispose?.();
       printDepositInfo({ address: addr, network: chainId === 8453 ? 'base' : 'sepolia', usdcAddress: process.env.USDC_ADDRESS });
+    } else if (cmd === 'protocols') {
+      const { readFileSync } = await import('node:fs');
+      const y = JSON.parse(readFileSync('data/yields.json','utf8'));
+      for (const v of y.venues) console.log(`${v.id}: ${(v.apy??0).toFixed(2)}%  (${v.sourceUrl})`);
     } else if (cmd === 'status') {
       const { observe } = await import('./observe.js');
       const st = await observe(source);
