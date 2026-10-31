@@ -7,6 +7,7 @@
     "spike:qvac": "node spikes/spike-qvac.mjs",
     "spike:wdk": "node spikes/wdk/spike-wdk.mjs",
     "cycle": "node src/agent/cli.js",
+    "chat": "node src/agent/chat.js",
     "deposit": "node src/deposit/index.js",
     "run": "node src/exec/run.js",
     "flush": "node src/exec/flush-cli.js",
